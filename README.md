@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 英语学习平台
 
-## Getting Started
+智能英文阅读标注工具 - 让英文阅读更简单
 
-First, run the development server:
+## 功能特点
+
+- 📚 **智能标注**: 选中单词即可添加发音标注
+- 🔊 **发音学习**: AI 生成音标、释义和真人发音
+- ✨ **动态渲染**: 高亮显示标注单词，悬浮显示音标
+- 📝 **侧边管理**: 统一管理所有标注，随时复习
+
+## 技术栈
+
+- **前端**: Next.js 15 + React 19 + TypeScript
+- **样式**: Tailwind CSS v4 + shadcn/ui
+- **后端**: Supabase (PostgreSQL + Auth + Storage)
+- **AI模型**: GLM-4 (智谱AI)
+- **状态管理**: Zustand
+
+## 快速开始
+
+### 1. 安装依赖
+
+```bash
+npm install
+```
+
+### 2. 配置环境变量
+
+复制 `.env.example` 为 `.env.local` 并填入你的配置：
+
+```bash
+cp .env.example .env.local
+```
+
+需要配置：
+- Supabase 项目信息（[注册地址](https://supabase.com)）
+- GLM API Key（[获取地址](https://bigmodel.cn)）
+
+详细配置步骤见 [docs/supabase-setup.md](./docs/supabase-setup.md)
+
+### 3. 初始化数据库
+
+1. 登录 Supabase 控制台
+2. 进入 SQL Editor
+3. 执行 `supabase/schema.sql` 中的 SQL 语句
+
+### 4. 启动开发服务器
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+访问 http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 开发计划
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 一期 MVP（6周） - 进行中
 
-## Learn More
+- [x] 基础设施搭建
+- [x] 用户认证系统
+- [x] 文章上传和列表
+- [ ] GLM API 集成
+- [ ] 文本选择与标注
+- [ ] 动态高亮渲染
+- [ ] 标注侧边栏
 
-To learn more about Next.js, take a look at the following resources:
+详见 [docs/phase-1-plan.md](./docs/phase-1-plan.md) 和 [docs/phase-2-plan.md](./docs/phase-2-plan.md)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**让英文阅读更简单** | 智能标注 · 发音学习 · 高效记忆
