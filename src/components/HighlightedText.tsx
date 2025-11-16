@@ -119,9 +119,9 @@ function AnnotatedWord({ annotation, isPlaying, onPlay }: AnnotatedWordProps) {
       )}
 
       {/* 播放图标提示 */}
-      <span className="opacity-0 group-hover:opacity-100 transition-opacity text-sm ml-1 align-middle">
+      {/* <span className="opacity-0 group-hover:opacity-100 transition-opacity text-sm ml-1 align-middle">
         🔊
-      </span>
+      </span> */}
     </span>
   );
 }
