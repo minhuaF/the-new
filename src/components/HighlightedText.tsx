@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import type { Annotation } from '@/lib/types/database';
 import { cn } from '@/lib/utils';
 
@@ -95,14 +95,8 @@ interface AnnotatedWordProps {
 }
 
 function AnnotatedWord({ annotation, isPlaying, onPlay }: AnnotatedWordProps) {
-  const [showPhonetic, setShowPhonetic] = useState(false);
-
   return (
-    <span
-      className="relative inline-block group"
-      onMouseEnter={() => setShowPhonetic(true)}
-      onMouseLeave={() => setShowPhonetic(false)}
-    >
+    <span className="inline-block group">
       {/* 高亮文本 */}
       <mark
         className={cn(
@@ -117,15 +111,15 @@ function AnnotatedWord({ annotation, isPlaying, onPlay }: AnnotatedWordProps) {
         {annotation.selected_text}
       </mark>
 
-      {/* 音标（悬浮显示） */}
-      {annotation.phonetic && showPhonetic && (
-        <span className="absolute -top-6 left-0 text-xs text-blue-600 font-mono whitespace-nowrap bg-white px-2 py-1 rounded shadow-md border border-blue-200 z-10">
+      {/* 音标（直接显示在单词右边） */}
+      {annotation.phonetic && (
+        <span className="text-xs text-blue-600 font-mono ml-1 align-middle">
           {annotation.phonetic}
         </span>
       )}
 
       {/* 播放图标提示 */}
-      <span className="absolute -right-5 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-sm">
+      <span className="opacity-0 group-hover:opacity-100 transition-opacity text-sm ml-1 align-middle">
         🔊
       </span>
     </span>
