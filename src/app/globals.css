@@ -6,10 +6,71 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* ========== 字体系统 ========== */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* ========== 色彩系统 ========== */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* 品牌色 - 蓝紫渐变 (使用 oklch 更准确的感知色彩) */
+  --color-brand-50: oklch(0.97 0.01 264);
+  --color-brand-100: oklch(0.94 0.03 264);
+  --color-brand-200: oklch(0.88 0.06 264);
+  --color-brand-300: oklch(0.78 0.12 264);
+  --color-brand-400: oklch(0.65 0.18 264);
+  --color-brand-500: oklch(0.55 0.22 264);
+  --color-brand-600: oklch(0.45 0.25 264);
+  --color-brand-700: oklch(0.38 0.22 264);
+  --color-brand-800: oklch(0.30 0.18 264);
+  --color-brand-900: oklch(0.24 0.12 264);
+
+  /* 阅读模式 - 浅米色背景,减少蓝光 */
+  --color-reading-bg: oklch(0.98 0.02 85);
+  --color-reading-text: oklch(0.25 0.01 85);
+
+  /* 高亮色板 - 6 种柔和色彩 */
+  --color-highlight-yellow: oklch(0.95 0.08 95);
+  --color-highlight-green: oklch(0.95 0.08 140);
+  --color-highlight-blue: oklch(0.95 0.08 240);
+  --color-highlight-purple: oklch(0.95 0.08 300);
+  --color-highlight-orange: oklch(0.95 0.10 50);
+  --color-highlight-pink: oklch(0.95 0.08 350);
+
+  /* ========== 字体尺寸 - 阅读优化 ========== */
+  --font-size-reading-xs: 0.875rem;    /* 14px - 音标 */
+  --font-size-reading-sm: 1rem;        /* 16px - 小号 */
+  --font-size-reading-base: 1.125rem;  /* 18px - 正文默认 */
+  --font-size-reading-lg: 1.25rem;     /* 20px - 大号 */
+  --font-size-reading-xl: 1.5rem;      /* 24px - 超大 */
+
+  /* ========== 间距系统 ========== */
+  --spacing-touch: 2.75rem;   /* 44px - 移动端触摸目标 */
+  --spacing-comfort: 1.5rem;  /* 24px - 舒适间距 */
+
+  /* ========== 圆角系统 ========== */
+  --radius-sm: 0.5rem;   /* 8px */
+  --radius-md: 0.75rem;  /* 12px */
+  --radius-lg: 1rem;     /* 16px */
+  --radius-xl: 1.5rem;   /* 24px */
+
+  /* ========== 阴影系统 ========== */
+  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 2px 8px 0 rgb(0 0 0 / 0.08);
+  --shadow-md: 0 4px 16px 0 rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 8px 32px 0 rgb(0 0 0 / 0.12);
+  --shadow-xl: 0 16px 48px 0 rgb(0 0 0 / 0.15);
+
+  /* ========== 动画时长 ========== */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+
+  /* ========== 缓动函数 ========== */
+  --ease-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +80,130 @@
   }
 }
 
+/* ========== 自定义工具类 ========== */
+
+@utility reading-mode {
+  background-color: var(--color-reading-bg);
+  color: var(--color-reading-text);
+  line-height: 1.8;
+}
+
+@utility touch-target {
+  min-height: var(--spacing-touch);
+  min-width: var(--spacing-touch);
+}
+
+@utility card-hover {
+  transition: all var(--duration-normal) var(--ease-smooth);
+  &:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+}
+
+@utility fade-in {
+  animation: fade-in var(--duration-normal) var(--ease-smooth);
+}
+
+@utility slide-up {
+  animation: slide-up var(--duration-normal) var(--ease-smooth);
+}
+
+@utility pulse-once {
+  animation: pulse var(--duration-slow) var(--ease-smooth) 1;
+}
+
+@utility scale-in {
+  animation: scale-in var(--duration-fast) var(--ease-spring);
+}
+
+/* ========== 关键帧动画 ========== */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* ========== 全局样式 ========== */
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  /* Mobile-optimized base font size (prevents iOS zoom on input focus) */
+  font-size: 16px;
+  line-height: 1.6;
+  /* Improved text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ========== 响应式优化 ========== */
+
+/* Ensure minimum touch target sizes on mobile */
+@media (max-width: 640px) {
+  a, button, input, select, textarea {
+    min-height: 44px;
+  }
+
+  /* Better line height for small screens */
+  p {
+    line-height: 1.7;
+  }
+}
+
+/* Safe area insets for iOS notch/home indicator */
+@supports (padding: max(0px)) {
+  .safe-area-inset-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .safe-area-inset-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
 }

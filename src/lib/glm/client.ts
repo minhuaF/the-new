@@ -72,7 +72,7 @@ export async function queryWordDefinition(word: string): Promise<GLMWordInfo> {
       }
 
       return parsed;
-    } catch (parseError) {
+    } catch {
       console.error('Failed to parse GLM response:', content);
       // 降级处理：返回基础数据
       return {
@@ -82,9 +82,12 @@ export async function queryWordDefinition(word: string): Promise<GLMWordInfo> {
         ],
       };
     }
-  } catch (error: any) {
-    console.error('GLM API Error:', error.response?.data || error.message);
-    throw new Error('查询单词失败：' + (error.response?.data?.error?.message || error.message));
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('GLM API Error:', error.response?.data || error.message);
+      throw new Error('查询单词失败：' + (error.response?.data?.error?.message || error.message));
+    }
+    throw new Error('查询单词失败：未知错误');
   }
 }
 
@@ -117,9 +120,10 @@ export async function generateAudio(text: string): Promise<ArrayBuffer> {
     );
 
     return response.data;
-  } catch (error: any) {
-    console.error('GLM Audio Generation Error:', error.response?.data || error.message);
-
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('GLM Audio Generation Error:', error.response?.data || error.message);
+    }
     // 如果 GLM 不支持 TTS，抛出错误让前端使用 Web Speech API
     throw new Error('AUDIO_NOT_SUPPORTED');
   }

@@ -14,10 +14,10 @@ import {
 interface AnnotationSidebarProps {
   annotations: Annotation[];
   onDelete: (id: string) => void;
-  onRefresh: () => void;
+  onRefresh?: () => void;
 }
 
-export function AnnotationSidebar({ annotations, onDelete, onRefresh }: AnnotationSidebarProps) {
+export function AnnotationSidebar({ annotations, onDelete }: AnnotationSidebarProps) {
   const [playingId, setPlayingId] = useState<string | null>(null);
 
   const handlePlay = (annotation: Annotation) => {
@@ -130,7 +130,7 @@ export function AnnotationSidebar({ annotations, onDelete, onRefresh }: Annotati
                 {/* 上下文 */}
                 {annotation.context_sentence && (
                   <p className="text-xs text-gray-400 italic border-l-2 border-gray-200 pl-3 py-1">
-                    "{annotation.context_sentence}"
+                    &ldquo;{annotation.context_sentence}&rdquo;
                   </p>
                 )}
 

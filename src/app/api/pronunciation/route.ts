@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
       // 上传音频到 Supabase Storage
       const fileName = `${Date.now()}-${word.replace(/\s+/g, '-')}.mp3`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('pronunciations')
         .upload(fileName, audioBuffer, {
           contentType: 'audio/mpeg',
@@ -56,9 +56,10 @@ export async function POST(request: Request) {
 
         audioUrl = publicUrl;
       }
-    } catch (audioError: any) {
+    } catch (audioError) {
       // 如果是不支持TTS的错误，静默处理
-      if (audioError.message === 'AUDIO_NOT_SUPPORTED') {
+      const errorMessage = audioError instanceof Error ? audioError.message : 'UNKNOWN';
+      if (errorMessage === 'AUDIO_NOT_SUPPORTED') {
         console.log('GLM TTS not supported, will use Web Speech API on client');
       } else {
         console.error('Audio generation error:', audioError);
@@ -93,13 +94,14 @@ export async function POST(request: Request) {
       annotation,
       useWebSpeech: !audioUrl, // 告诉前端是否需要使用 Web Speech API
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Pronunciation API Error:', error);
+    const errorMessage = error instanceof Error ? error.message : '处理失败';
 
     return NextResponse.json(
       {
-        error: error.message || '处理失败',
-        details: error.response?.data || null,
+        error: errorMessage,
+        details: null,
       },
       { status: 500 }
     );
