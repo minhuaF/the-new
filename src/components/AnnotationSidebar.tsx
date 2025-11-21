@@ -10,14 +10,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 
 interface AnnotationSidebarProps {
   annotations: Annotation[];
   onDelete: (id: string) => void;
   onRefresh?: () => void;
+  variant?: 'desktop' | 'mobile';
 }
 
-export function AnnotationSidebar({ annotations, onDelete }: AnnotationSidebarProps) {
+export function AnnotationSidebar({
+  annotations,
+  onDelete,
+  variant = 'desktop'
+}: AnnotationSidebarProps) {
   const [playingId, setPlayingId] = useState<string | null>(null);
 
   const handlePlay = (annotation: Annotation) => {
@@ -54,40 +60,73 @@ export function AnnotationSidebar({ annotations, onDelete }: AnnotationSidebarPr
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
       // 临时高亮动画
-      element.classList.add('ring-4', 'ring-blue-400');
+      element.classList.add('ring-4', 'ring-rose-400');
       setTimeout(() => {
-        element.classList.remove('ring-4', 'ring-blue-400');
+        element.classList.remove('ring-4', 'ring-rose-400');
       }, 2000);
     }
   };
 
+  const isMobile = variant === 'mobile';
+
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold">📚 我的标注</h2>
-        <span className="text-sm text-gray-500">({annotations.length})</span>
+    <div className={cn(
+      isMobile ? 'p-4' : 'p-6'
+    )}>
+      <div className={cn(
+        "flex items-center justify-between mb-6",
+        isMobile && "mb-4"
+      )}>
+        <h2 className={cn(
+          "font-serif font-light text-slate-800",
+          isMobile ? "text-lg" : "text-xl"
+        )}>
+          📚 我的标注
+        </h2>
+        <span className="text-sm text-slate-400 font-light">({annotations.length})</span>
       </div>
 
       {annotations.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="text-6xl mb-4">✨</div>
-          <p className="text-gray-500 mb-2">还没有标注</p>
-          <p className="text-sm text-gray-400">
+        <div className={cn(
+          "text-center",
+          isMobile ? "py-12" : "py-16"
+        )}>
+          <div className={cn(
+            "mb-4",
+            isMobile ? "text-5xl" : "text-6xl"
+          )}>✨</div>
+          <p className="text-slate-500 font-light mb-2">还没有标注</p>
+          <p className="text-sm text-slate-400 font-light">
             选中单词开始学习吧
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className={cn(
+          "space-y-4",
+          isMobile && "space-y-3"
+        )}>
           {annotations.map((annotation) => (
-            <Card key={annotation.id} className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
+            <Card
+              key={annotation.id}
+              className={cn(
+                "hover:shadow-md transition-all duration-300 border-slate-200",
+                isMobile ? "rounded-2xl" : "rounded-3xl"
+              )}
+            >
+              <CardHeader className={cn(
+                "pb-3",
+                isMobile && "pb-2"
+              )}>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-1">
+                    <h3 className={cn(
+                      "font-serif font-light text-slate-800 mb-1",
+                      isMobile ? "text-base" : "text-lg"
+                    )}>
                       {annotation.selected_text}
                     </h3>
                     {annotation.phonetic && (
-                      <p className="text-sm text-blue-600 font-mono">
+                      <p className="text-sm text-rose-500 font-mono font-light">
                         {annotation.phonetic}
                       </p>
                     )}
@@ -95,17 +134,24 @@ export function AnnotationSidebar({ annotations, onDelete }: AnnotationSidebarPr
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <span className="text-lg">⋮</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 hover:bg-slate-100"
+                      >
+                        <span className="text-lg text-slate-400">⋮</span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleJumpToText(annotation.id)}>
+                    <DropdownMenuContent align="end" className="rounded-xl">
+                      <DropdownMenuItem
+                        onClick={() => handleJumpToText(annotation.id)}
+                        className="font-light"
+                      >
                         📍 跳转到原文
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => onDelete(annotation.id)}
-                        className="text-red-600"
+                        className="text-red-500 font-light hover:text-red-600"
                       >
                         🗑️ 删除
                       </DropdownMenuItem>
@@ -114,14 +160,17 @@ export function AnnotationSidebar({ annotations, onDelete }: AnnotationSidebarPr
                 </div>
               </CardHeader>
 
-              <CardContent className="space-y-3 pt-0">
+              <CardContent className={cn(
+                "space-y-3 pt-0",
+                isMobile && "space-y-2"
+              )}>
                 {/* 释义 */}
                 {annotation.definition && annotation.definition.length > 0 && (
-                  <div className="text-sm space-y-1">
+                  <div className="text-sm space-y-1 font-light">
                     {annotation.definition.map((def, idx) => (
                       <p key={idx}>
-                        <span className="text-gray-500 font-medium">{def.pos}</span>{' '}
-                        <span className="text-gray-700">{def.meaning}</span>
+                        <span className="text-slate-500 font-normal">{def.pos}</span>{' '}
+                        <span className="text-slate-700">{def.meaning}</span>
                       </p>
                     ))}
                   </div>
@@ -129,17 +178,26 @@ export function AnnotationSidebar({ annotations, onDelete }: AnnotationSidebarPr
 
                 {/* 上下文 */}
                 {annotation.context_sentence && (
-                  <p className="text-xs text-gray-400 italic border-l-2 border-gray-200 pl-3 py-1">
+                  <p className={cn(
+                    "text-xs text-slate-400 font-light italic border-l-2 border-rose-200 pl-3 py-1",
+                    isMobile && "text-xs"
+                  )}>
                     &ldquo;{annotation.context_sentence}&rdquo;
                   </p>
                 )}
 
                 {/* 操作按钮 */}
-                <div className="flex gap-2 pt-2">
+                <div className={cn(
+                  "flex gap-2 pt-2",
+                  isMobile && "gap-2 pt-1"
+                )}>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="flex-1"
+                    className={cn(
+                      "flex-1 border-slate-300 hover:border-rose-400 hover:bg-rose-50 rounded-xl font-light transition-all duration-300",
+                      isMobile && "text-xs h-8"
+                    )}
                     onClick={() => handlePlay(annotation)}
                     disabled={playingId === annotation.id}
                   >
@@ -156,6 +214,10 @@ export function AnnotationSidebar({ annotations, onDelete }: AnnotationSidebarPr
                   <Button
                     size="sm"
                     variant="outline"
+                    className={cn(
+                      "border-slate-300 hover:border-amber-400 hover:bg-amber-50 rounded-xl font-light transition-all duration-300",
+                      isMobile && "text-xs h-8 px-3"
+                    )}
                     onClick={() => handleJumpToText(annotation.id)}
                   >
                     跳转

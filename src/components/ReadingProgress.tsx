@@ -77,7 +77,7 @@ export function ReadingProgress({
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 h-1 bg-gray-200 z-50 cursor-pointer group"
+      className="fixed top-0 left-0 right-0 h-1 bg-slate-200 z-50 cursor-pointer group"
       onClick={handleProgressClick}
       role="progressbar"
       aria-valuenow={Math.round(progress)}
@@ -85,12 +85,12 @@ export function ReadingProgress({
       aria-valuemax={100}
     >
       <div
-        className="h-full bg-gradient-to-r from-brand-500 to-brand-600 transition-all duration-150 ease-out"
+        className="h-full bg-gradient-to-r from-rose-400 via-amber-400 to-rose-500 transition-all duration-150 ease-out"
         style={{ width: `${progress}%` }}
       />
 
       {/* Hover 提示 */}
-      <div className="absolute top-full right-4 mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+      <div className="absolute top-full right-4 mt-2 px-3 py-1.5 bg-slate-800/90 backdrop-blur-sm text-white text-xs rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-light shadow-lg">
         {Math.round(progress)}%
       </div>
     </div>

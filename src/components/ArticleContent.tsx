@@ -28,7 +28,7 @@ export function ArticleContent({
   return (
     <div
       className={cn(
-        'article-content prose prose-lg max-w-none transition-all duration-300',
+        'article-content prose prose-lg max-w-none transition-all duration-300 font-light text-slate-800',
         readingMode && 'reading-mode',
         className
       )}

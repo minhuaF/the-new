@@ -22,12 +22,12 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
       <div className="text-6xl sm:text-7xl mb-6 scale-in">{icon}</div>
 
       {/* 标题 */}
-      <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3 slide-up">
+      <h2 className="text-xl sm:text-2xl font-serif font-light text-slate-800 mb-3 slide-up">
         {title}
       </h2>
 
       {/* 描述 */}
-      <p className="text-gray-600 text-base sm:text-lg max-w-md mb-8 slide-up">
+      <p className="text-slate-600 font-light text-base sm:text-lg max-w-md mb-8 slide-up">
         {description}
       </p>
 

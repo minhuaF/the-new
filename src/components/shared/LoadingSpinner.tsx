@@ -19,7 +19,7 @@ export function LoadingSpinner({ size = 'md', className }: LoadingSpinnerProps) 
   return (
     <div
       className={cn(
-        'rounded-full border-gray-200 border-t-brand-600 animate-spin',
+        'rounded-full border-slate-200 border-t-rose-400 animate-spin',
         sizeClasses[size],
         className
       )}
@@ -36,9 +36,9 @@ export function LoadingSpinner({ size = 'md', className }: LoadingSpinnerProps) 
  */
 export function LoadingScreen({ message }: { message?: string }) {
   return (
-    <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 fade-in">
+    <div className="fixed inset-0 bg-gradient-to-br from-rose-50 via-amber-50 to-sky-50 backdrop-blur-sm flex flex-col items-center justify-center z-50 fade-in">
       <LoadingSpinner size="xl" />
-      {message && <p className="mt-6 text-gray-600 text-lg">{message}</p>}
+      {message && <p className="mt-6 text-slate-600 font-light text-lg">{message}</p>}
     </div>
   )
 }

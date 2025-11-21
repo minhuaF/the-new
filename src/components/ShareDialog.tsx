@@ -9,31 +9,21 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  WordCardTemplate,
-  type WordCardData,
-} from '@/components/share-templates/WordCardTemplate';
-import {
-  NoteCardTemplate,
-  type NoteCardData,
-} from '@/components/share-templates/NoteCardTemplate';
-import {
-  LearningSummaryTemplate,
-  type LearningSummaryData,
-} from '@/components/share-templates/LearningSummaryTemplate';
+  ArticleShareTemplate,
+  type ArticleShareData,
+  type WordNote,
+} from '@/components/share-templates/ArticleShareTemplate';
 import { generateAndDownload } from '@/lib/share';
 import { toast } from 'sonner';
 import { Download, Loader2 } from 'lucide-react';
+import type { Article, Annotation } from '@/lib/types/database';
 
 interface ShareDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  // 可以传入初始数据
-  initialData?: {
-    type: 'word' | 'note' | 'summary';
-    data: WordCardData | NoteCardData | LearningSummaryData;
-  };
+  article?: Article;
+  annotations?: Annotation[];
 }
 
 const themes = ['blue', 'orange', 'green', 'purple', 'gray'] as const;
@@ -46,67 +36,33 @@ const themeLabels = {
   gray: '简约灰',
 };
 
-export function ShareDialog({ open, onOpenChange, initialData }: ShareDialogProps) {
+export function ShareDialog({ open, onOpenChange, article, annotations = [] }: ShareDialogProps) {
   const [generating, setGenerating] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<typeof themes[number]>('blue');
-  const [activeTab, setActiveTab] = useState<'word' | 'note' | 'summary'>(
-    initialData?.type || 'word'
-  );
 
-  // 示例数据
-  const [wordData, setWordData] = useState<WordCardData>(
-    initialData?.type === 'word'
-      ? (initialData.data as WordCardData)
-      : {
-          word: 'serendipity',
-          phonetic: '/ˌserənˈdɪpəti/',
-          definition: '意外发现珍奇事物的本领；机缘巧合',
-          theme: selectedTheme,
-        }
-  );
-
-  const [noteData, setNoteData] = useState<NoteCardData>(
-    initialData?.type === 'note'
-      ? (initialData.data as NoteCardData)
-      : {
-          phrase: 'in the long run',
-          context: 'In the long run, investing in education pays off.',
-          userNote: '表示"从长远来看"，常用于讨论长期影响和结果',
-          aiSuggestion: '**常见搭配**:\n• be worth it in the long run\n• think about the long run\n\n**例句**:\nIn the long run, this strategy will save us money.',
-          theme: selectedTheme,
-        }
-  );
-
-  const [summaryData, setSummaryData] = useState<LearningSummaryData>(
-    initialData?.type === 'summary'
-      ? (initialData.data as LearningSummaryData)
-      : {
-          period: '本周',
-          articlesRead: 5,
-          wordsAnnotated: 42,
-          studyDays: 6,
-          totalStudyTime: '3.5小时',
-          theme: selectedTheme,
-        }
-  );
+  // 准备分享数据
+  const shareData: ArticleShareData = {
+    title: article?.title || '示例文章标题',
+    excerpt: article?.content?.substring(0, 500) || '这是一篇示例文章的摘要内容...',
+    wordNotes: annotations
+      .filter(a => a.selected_text && a.phonetic && a.definition)
+      .map(a => ({
+        word: a.selected_text,
+        phonetic: a.phonetic || '',
+        translation: a.definition?.[0]?.meaning || '',
+      }))
+      .slice(0, 8), // 最多显示8个单词
+    articleCount: undefined, // 可以从用户统计获取
+    wordsCount: annotations.length,
+    theme: selectedTheme,
+  };
 
   const handleGenerate = async () => {
     setGenerating(true);
 
     try {
-      let elementId: string;
-      let filename: string;
-
-      if (activeTab === 'word') {
-        elementId = 'share-card';
-        filename = `word-card-${wordData.word}-${Date.now()}.png`;
-      } else if (activeTab === 'note') {
-        elementId = 'note-card';
-        filename = `note-card-${Date.now()}.png`;
-      } else {
-        elementId = 'learning-summary';
-        filename = `learning-summary-${Date.now()}.png`;
-      }
+      const elementId = 'article-share';
+      const filename = `article-${article?.title || 'share'}-${Date.now()}.png`;
 
       await generateAndDownload(
         {
@@ -129,36 +85,41 @@ export function ShareDialog({ open, onOpenChange, initialData }: ShareDialogProp
     }
   };
 
-  // 更新主题
-  const updateTheme = (theme: (typeof themes)[number]) => {
-    setSelectedTheme(theme);
-    setWordData({ ...wordData, theme });
-    setNoteData({ ...noteData, theme });
-    setSummaryData({ ...summaryData, theme });
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] sm:max-w-4xl lg:max-w-6xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+      <DialogContent className="max-w-[95vw] sm:max-w-4xl lg:max-w-6xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 rounded-3xl">
         <DialogHeader>
-          <DialogTitle className="text-lg sm:text-xl">生成分享图片</DialogTitle>
-          <DialogDescription className="text-sm">
-            选择模板和主题，生成精美的学习分享卡片
-          </DialogDescription>
+          <div className="space-y-2">
+            <p className="text-xs uppercase tracking-[0.3em] text-rose-400 font-light">
+              Share Your Learning
+            </p>
+            <DialogTitle className="text-2xl sm:text-3xl font-serif font-light text-slate-800">
+              分享文章笔记
+            </DialogTitle>
+            <DialogDescription className="text-sm text-slate-500 font-light">
+              选择主题色，生成包含文章内容和单词笔记的分享卡片
+            </DialogDescription>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-6 sm:space-y-8 mt-6">
           {/* 主题选择 */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">选择主题</label>
+          <div className="space-y-3">
+            <label className="text-sm font-light text-slate-600 tracking-wide">选择主题色</label>
             <div className="flex flex-wrap gap-2">
               {themes.map((theme) => (
                 <Button
                   key={theme}
                   variant={selectedTheme === theme ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => updateTheme(theme)}
-                  className="text-xs sm:text-sm"
+                  onClick={() => setSelectedTheme(theme)}
+                  className={`
+                    text-xs sm:text-sm rounded-xl font-light tracking-wide transition-all duration-300
+                    ${selectedTheme === theme
+                      ? 'bg-rose-400 hover:bg-rose-500 text-white shadow-md'
+                      : 'border-slate-300 hover:border-rose-400 hover:bg-rose-50'
+                    }
+                  `}
                 >
                   {themeLabels[theme]}
                 </Button>
@@ -166,52 +127,26 @@ export function ShareDialog({ open, onOpenChange, initialData }: ShareDialogProp
             </div>
           </div>
 
-          {/* 模板选择和预览 */}
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'word' | 'note' | 'summary')}>
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="word" className="text-xs sm:text-sm">单词卡</TabsTrigger>
-              <TabsTrigger value="note" className="text-xs sm:text-sm">笔记卡</TabsTrigger>
-              <TabsTrigger value="summary" className="text-xs sm:text-sm">学习总结</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="word" className="mt-4 sm:mt-6">
-              <div className="flex justify-center overflow-x-auto">
-                <div className="transform scale-[0.3] sm:scale-[0.4] lg:scale-50 origin-top">
-                  <WordCardTemplate data={wordData} />
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="note" className="mt-4 sm:mt-6">
-              <div className="flex justify-center overflow-x-auto">
-                <div className="transform scale-[0.15] sm:scale-[0.2] lg:scale-25 origin-top">
-                  <NoteCardTemplate data={noteData} />
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="summary" className="mt-4 sm:mt-6">
-              <div className="flex justify-center overflow-x-auto">
-                <div className="transform scale-[0.3] sm:scale-[0.4] lg:scale-50 origin-top">
-                  <LearningSummaryTemplate data={summaryData} />
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+          {/* 预览区 */}
+          <div className="flex justify-center overflow-x-auto bg-slate-50 rounded-2xl p-4">
+            <div className="transform scale-[0.25] sm:scale-[0.3] lg:scale-[0.35] origin-top">
+              <ArticleShareTemplate data={{ ...shareData, theme: selectedTheme }} />
+            </div>
+          </div>
 
           {/* 操作按钮 */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-end pt-4 border-t">
+          <div className="flex flex-col sm:flex-row gap-3 sm:justify-end pt-6 border-t border-slate-200">
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="w-full sm:w-auto order-2 sm:order-1"
+              className="w-full sm:w-auto order-2 sm:order-1 h-12 border-2 border-slate-300 hover:border-amber-400 text-slate-700 rounded-2xl font-light tracking-wide transition-all duration-300 hover:bg-amber-50"
             >
               取消
             </Button>
             <Button
               onClick={handleGenerate}
-              disabled={generating}
-              className="w-full sm:w-auto order-1 sm:order-2"
+              disabled={generating || !article || annotations.length === 0}
+              className="w-full sm:w-auto order-1 sm:order-2 h-12 bg-rose-400 hover:bg-rose-500 text-white rounded-2xl font-light tracking-wide transition-all duration-300 hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {generating ? (
                 <>
@@ -230,9 +165,7 @@ export function ShareDialog({ open, onOpenChange, initialData }: ShareDialogProp
 
         {/* 隐藏的全尺寸模板（用于生成图片） */}
         <div className="fixed -left-[10000px] -top-[10000px]">
-          {activeTab === 'word' && <WordCardTemplate data={wordData} />}
-          {activeTab === 'note' && <NoteCardTemplate data={noteData} />}
-          {activeTab === 'summary' && <LearningSummaryTemplate data={summaryData} />}
+          <ArticleShareTemplate data={{ ...shareData, theme: selectedTheme }} />
         </div>
       </DialogContent>
     </Dialog>

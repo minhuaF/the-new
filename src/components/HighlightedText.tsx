@@ -12,41 +12,69 @@ interface HighlightedTextProps {
 export function HighlightedText({ content, annotations }: HighlightedTextProps) {
   const [playingId, setPlayingId] = useState<string | null>(null);
 
-  // 按起始位置排序标注
-  const sortedAnnotations = [...annotations].sort((a, b) => a.start_offset - b.start_offset);
+  // 创建单词到标注的映射（用于全文匹配）
+  const wordToAnnotation = new Map<string, Annotation>();
+  annotations.forEach(annotation => {
+    const word = annotation.selected_text.toLowerCase();
+    // 只保留第一个标注（或者可以根据 created_at 选择最新的）
+    if (!wordToAnnotation.has(word)) {
+      wordToAnnotation.set(word, annotation);
+    }
+  });
 
-  // 构建渲染片段
+  // 按起始位置排序标注（用于确定哪些是真正被标注的位置）
+  const annotatedPositions = new Set(
+    annotations.map(a => `${a.start_offset}-${a.end_offset}`)
+  );
+
+  // 将文本分词并渲染
   const segments: React.ReactNode[] = [];
-  let lastIndex = 0;
+  let currentIndex = 0;
 
-  sortedAnnotations.forEach((annotation, idx) => {
-    // 添加未标注的普通文本
-    if (annotation.start_offset > lastIndex) {
+  // 使用正则分词：保留单词、空格和标点
+  const tokenRegex = /([a-zA-Z0-9'-]+)|(\s+)|([^\w\s]+)/g;
+  let match;
+
+  while ((match = tokenRegex.exec(content)) !== null) {
+    const token = match[0];
+    const startIndex = match.index;
+    const endIndex = startIndex + token.length;
+
+    // 检查这个 token 是否是单词
+    if (match[1]) {
+      // 是单词，检查是否有对应的标注
+      const word = token.toLowerCase();
+      const annotation = wordToAnnotation.get(word);
+
+      if (annotation) {
+        // 检查这个位置是否是真正被标注的位置
+        const positionKey = `${startIndex}-${endIndex}`;
+        const isAnnotatedPosition = annotatedPositions.has(positionKey);
+
+        segments.push(
+          <AnnotatedWord
+            key={`word-${startIndex}`}
+            annotation={annotation}
+            text={token}
+            isPlaying={playingId === annotation.id}
+            onPlay={() => handlePlay(annotation)}
+            isHighlighted={isAnnotatedPosition}
+          />
+        );
+      } else {
+        // 普通单词
+        segments.push(
+          <span key={`text-${startIndex}`}>{token}</span>
+        );
+      }
+    } else {
+      // 空格或标点
       segments.push(
-        <span key={`text-${idx}`}>
-          {content.slice(lastIndex, annotation.start_offset)}
-        </span>
+        <span key={`text-${startIndex}`}>{token}</span>
       );
     }
 
-    // 添加标注文本（带高亮和音标）
-    segments.push(
-      <AnnotatedWord
-        key={annotation.id}
-        annotation={annotation}
-        isPlaying={playingId === annotation.id}
-        onPlay={() => handlePlay(annotation)}
-      />
-    );
-
-    lastIndex = annotation.end_offset;
-  });
-
-  // 添加剩余的普通文本
-  if (lastIndex < content.length) {
-    segments.push(
-      <span key="text-end">{content.slice(lastIndex)}</span>
-    );
+    currentIndex = endIndex;
   }
 
   const handlePlay = (annotation: Annotation) => {
@@ -90,38 +118,47 @@ export function HighlightedText({ content, annotations }: HighlightedTextProps) 
 // 单个标注单词组件
 interface AnnotatedWordProps {
   annotation: Annotation;
+  text: string; // 实际显示的文本（保持原始大小写）
   isPlaying: boolean;
   onPlay: () => void;
+  isHighlighted: boolean; // 是否是被标注的位置（需要高亮）
 }
 
-function AnnotatedWord({ annotation, isPlaying, onPlay }: AnnotatedWordProps) {
+function AnnotatedWord({ annotation, text, isPlaying, onPlay, isHighlighted }: AnnotatedWordProps) {
   return (
     <span className="inline-block group">
-      {/* 高亮文本 */}
-      <mark
-        className={cn(
-          'cursor-pointer transition-all px-1 rounded',
-          'hover:shadow-md',
-          isPlaying && 'ring-2 ring-blue-400 animate-pulse'
-        )}
-        style={{ backgroundColor: annotation.highlight_color }}
-        onClick={onPlay}
-        data-annotation-id={annotation.id}
-      >
-        {annotation.selected_text}
-      </mark>
-
-      {/* 音标（直接显示在单词右边） */}
-      {annotation.phonetic && (
-        <span className="text-xs text-blue-600 font-mono ml-1 align-middle">
-          {annotation.phonetic}
+      {/* 文本（如果是标注位置则高亮） */}
+      {isHighlighted ? (
+        <mark
+          className={cn(
+            'cursor-pointer transition-all px-1 rounded-lg font-light',
+            'hover:shadow-md hover:scale-105',
+            isPlaying && 'ring-2 ring-rose-400 animate-pulse'
+          )}
+          style={{ backgroundColor: annotation.highlight_color }}
+          onClick={onPlay}
+          data-annotation-id={annotation.id}
+        >
+          {text}
+        </mark>
+      ) : (
+        <span
+          className={cn(
+            'cursor-pointer transition-all',
+            isPlaying && 'ring-2 ring-rose-400 animate-pulse'
+          )}
+          onClick={onPlay}
+        >
+          {text}
         </span>
       )}
 
-      {/* 播放图标提示 */}
-      {/* <span className="opacity-0 group-hover:opacity-100 transition-opacity text-sm ml-1 align-middle">
-        🔊
-      </span> */}
+      {/* 音标（所有相同单词都显示） */}
+      {annotation.phonetic && (
+        <span className="text-xs text-rose-500 font-mono font-light ml-1 align-middle">
+          {annotation.phonetic}
+        </span>
+      )}
     </span>
   );
 }

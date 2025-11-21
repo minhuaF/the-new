@@ -5,26 +5,26 @@ import { Skeleton } from './Skeleton'
  */
 export function ArticleCardSkeleton() {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+    <div className="h-full bg-white/70 backdrop-blur-sm rounded-3xl border border-slate-200 overflow-hidden">
       {/* 渐变封面 */}
-      <Skeleton className="h-32 sm:h-40 w-full rounded-none" />
+      <Skeleton className="h-36 w-full rounded-none" />
 
       {/* 内容区域 */}
       <div className="p-6 space-y-3">
         {/* 标题 */}
-        <Skeleton className="h-6 w-3/4" />
+        <Skeleton className="h-6 w-3/4 rounded-2xl" />
 
         {/* 内容预览 */}
         <div className="space-y-2">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-4 w-full rounded-xl" />
+          <Skeleton className="h-4 w-full rounded-xl" />
+          <Skeleton className="h-4 w-2/3 rounded-xl" />
         </div>
 
         {/* 元信息 */}
         <div className="flex items-center gap-4 pt-2">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-24 rounded-xl" />
+          <Skeleton className="h-4 w-20 rounded-xl" />
         </div>
       </div>
     </div>

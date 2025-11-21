@@ -21,7 +21,9 @@ export function FocusModeToggle({ className }: FocusModeToggleProps) {
       variant="outline"
       size="sm"
       onClick={() => setFocusMode(!focusMode)}
-      className={className}
+      className={`border-slate-300 hover:border-amber-400 hover:bg-amber-50 transition-all duration-300 rounded-xl font-light ${
+        focusMode ? 'bg-amber-100 border-amber-400 text-amber-700' : ''
+      } ${className || ''}`}
       title={focusMode ? '退出专注模式' : '进入专注模式'}
     >
       {focusMode ? (

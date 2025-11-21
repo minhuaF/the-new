@@ -25,7 +25,6 @@ export function useTextSelection(containerSelector = '.article-content'): TextSe
       return;
     }
 
-    const text = sel.toString().trim();
     const range = sel.getRangeAt(0);
 
     // 检查选择是否在指定容器内
@@ -43,7 +42,14 @@ export function useTextSelection(containerSelector = '.article-content'): TextSe
     }
 
     // 计算文本在整个内容中的偏移量
-    const { startOffset, endOffset } = calculateTextOffsets(container, range);
+    let { startOffset, endOffset } = calculateTextOffsets(container, range);
+
+    // 扩展选择到完整单词边界
+    const fullText = container.textContent || '';
+    const adjusted = adjustToWordBoundaries(fullText, startOffset, endOffset);
+    startOffset = adjusted.startOffset;
+    endOffset = adjusted.endOffset;
+    const adjustedText = fullText.substring(startOffset, endOffset);
 
     // 获取选择区域的位置（用于显示浮窗）
     const rect = range.getBoundingClientRect();
@@ -53,7 +59,7 @@ export function useTextSelection(containerSelector = '.article-content'): TextSe
     };
 
     setSelection({
-      text,
+      text: adjustedText,
       startOffset,
       endOffset,
       position,
@@ -96,6 +102,40 @@ function calculateTextOffsets(
   const endOffset = startOffset + range.toString().length;
 
   return { startOffset, endOffset };
+}
+
+/**
+ * 调整选择范围到完整的单词边界
+ * 确保不会选中部分单词（例如 creative 不会匹配到 creatives）
+ * @param text 完整文本
+ * @param start 选择的起始偏移量
+ * @param end 选择的结束偏移量
+ * @returns 调整后的偏移量
+ */
+function adjustToWordBoundaries(
+  text: string,
+  start: number,
+  end: number
+): { startOffset: number; endOffset: number } {
+  // 单词字符正则：字母、数字、连字符、撇号
+  const wordCharRegex = /[a-zA-Z0-9'-]/;
+
+  // 向前扩展到单词开始
+  let adjustedStart = start;
+  while (adjustedStart > 0 && wordCharRegex.test(text[adjustedStart - 1])) {
+    adjustedStart--;
+  }
+
+  // 向后扩展到单词结束
+  let adjustedEnd = end;
+  while (adjustedEnd < text.length && wordCharRegex.test(text[adjustedEnd])) {
+    adjustedEnd++;
+  }
+
+  return {
+    startOffset: adjustedStart,
+    endOffset: adjustedEnd,
+  };
 }
 
 /**

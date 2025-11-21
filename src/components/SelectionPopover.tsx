@@ -107,7 +107,7 @@ export function SelectionPopover({
   return (
     <div
       ref={popoverRef}
-      className="fixed z-50 bg-white shadow-lg rounded-lg border border-gray-200 p-2 flex gap-2 animate-in fade-in duration-200"
+      className="fixed z-50 bg-white/90 backdrop-blur-lg shadow-lg rounded-2xl border border-rose-200 p-2 flex gap-2 animate-in fade-in duration-200"
       style={{
         left: `${adjustedPosition.x}px`,
         top: `${adjustedPosition.y}px`,
@@ -118,17 +118,19 @@ export function SelectionPopover({
         size="sm"
         onClick={handleAddPronunciation}
         disabled={loading}
-        className="whitespace-nowrap text-sm"
+        className="whitespace-nowrap text-sm h-9 px-4 bg-rose-400 hover:bg-rose-500 text-white rounded-xl font-light tracking-wide transition-all duration-300 hover:shadow-md hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
         {loading ? (
           <>
-            <span className="inline-block animate-spin mr-1 sm:mr-2">⏳</span>
+            <span className="inline-block mr-2">
+              <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block"></span>
+            </span>
             <span className="hidden sm:inline">处理中...</span>
             <span className="sm:hidden">...</span>
           </>
         ) : (
           <>
-            <span className="mr-1">🔊</span>
+            <span className="mr-2">🔊</span>
             <span className="hidden sm:inline">添加发音</span>
             <span className="sm:hidden">发音</span>
           </>

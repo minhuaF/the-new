@@ -83,7 +83,7 @@ export default function ArticleDetailPage() {
         .from('annotations')
         .select('*')
         .eq('article_id', articleId)
-        .order('start_offset', { ascending: true });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -124,9 +124,9 @@ export default function ArticleDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-amber-50 to-sky-50">
         <div className="text-center">
-          <div className="text-lg text-gray-600">加载中...</div>
+          <div className="text-lg text-slate-500 font-light">加载中...</div>
         </div>
       </div>
     );
@@ -137,14 +137,14 @@ export default function ArticleDetailPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-rose-50 via-amber-50 to-sky-50">
       {/* Reading Progress Bar */}
       <ReadingProgress scrollContainerSelector=".article-scroll-container" />
 
-      {/* Header */}
+      {/* Header - Editorial Style */}
       <header
         className={cn(
-          'bg-white border-b sticky top-0 z-10 transition-all duration-300',
+          'bg-white/80 backdrop-blur-lg border-b border-slate-200 sticky top-0 z-10 transition-all duration-300',
           focusMode && 'opacity-0 hover:opacity-100'
         )}
       >
@@ -152,20 +152,20 @@ export default function ArticleDetailPage() {
           <div className="flex items-center justify-between gap-2">
             {/* Left: Back button + Title */}
             <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-              <Button variant="ghost" size="sm" asChild className="shrink-0">
+              <Button variant="ghost" size="sm" asChild className="shrink-0 hover:bg-rose-100 font-light transition-colors duration-300">
                 <Link href="/articles">
                   <span className="hidden sm:inline">← 返回列表</span>
                   <span className="sm:hidden">←</span>
                 </Link>
               </Button>
-              <h1 className="text-lg sm:text-2xl font-bold truncate">
+              <h1 className="text-lg sm:text-2xl font-serif font-light truncate text-slate-800">
                 {article.title}
               </h1>
             </div>
 
             {/* Right: Settings + Annotations + Buttons */}
             <div className="flex items-center gap-2 shrink-0">
-              <div className="hidden sm:block text-sm text-gray-500">
+              <div className="hidden sm:block text-sm text-slate-400 font-light">
                 {annotations.length} 个标注
               </div>
 
@@ -180,7 +180,7 @@ export default function ArticleDetailPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setSidebarOpen(true)}
-                className={cn('lg:hidden', focusMode && 'hidden')}
+                className={cn('lg:hidden border-slate-300 hover:border-rose-400 hover:bg-rose-50 transition-all duration-300', focusMode && 'hidden')}
               >
                 <BookMarked className="w-4 h-4" />
                 <span className="ml-1 sm:ml-2">{annotations.length}</span>
@@ -191,6 +191,7 @@ export default function ArticleDetailPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShareDialogOpen(true)}
+                className="border-slate-300 hover:border-amber-400 hover:bg-amber-50 transition-all duration-300"
               >
                 <Share2 className="w-4 h-4" />
                 <span className="hidden sm:inline ml-2">分享</span>
@@ -202,17 +203,17 @@ export default function ArticleDetailPage() {
 
       {/* Main Content */}
       <div className="flex flex-1">
-        {/* Article Content */}
-        <div className="flex-1 overflow-y-auto article-scroll-container px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+        {/* Article Content - Immersive Reading */}
+        <div className="flex-1 overflow-y-auto article-scroll-container px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
           <div className={cn('mx-auto transition-all duration-300', focusMode ? 'max-w-3xl' : 'max-w-4xl')}>
             <ArticleContent content={article.content} annotations={annotations} />
           </div>
         </div>
 
-        {/* Desktop Sidebar - Hidden on mobile and in focus mode */}
+        {/* Desktop Sidebar - Soft Editorial Style */}
         <aside
           className={cn(
-            'hidden lg:block lg:w-96 border-l bg-gray-50 overflow-y-auto transition-all duration-300',
+            'hidden lg:block lg:w-96 border-l border-slate-200 bg-white/60 backdrop-blur-sm overflow-y-auto transition-all duration-300',
             focusMode && 'lg:hidden'
           )}
         >
@@ -225,14 +226,15 @@ export default function ArticleDetailPage() {
 
       {/* Mobile Sidebar - Sheet Drawer */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="bottom" className="h-[85vh]">
-          <SheetHeader>
-            <SheetTitle>我的标注 ({annotations.length})</SheetTitle>
+        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl">
+          <SheetHeader className="pb-2">
+            <SheetTitle className="font-serif font-light text-slate-800">我的标注 ({annotations.length})</SheetTitle>
           </SheetHeader>
-          <div className="mt-4 overflow-y-auto h-[calc(85vh-80px)]">
+          <div className="mt-2 overflow-y-auto h-[calc(85vh-80px)]">
             <AnnotationSidebar
               annotations={annotations}
               onDelete={handleDeleteAnnotation}
+              variant="mobile"
             />
           </div>
         </SheetContent>
@@ -252,6 +254,8 @@ export default function ArticleDetailPage() {
       <ShareDialog
         open={shareDialogOpen}
         onOpenChange={setShareDialogOpen}
+        article={article}
+        annotations={annotations}
       />
     </div>
   );
