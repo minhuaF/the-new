@@ -27,8 +27,13 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // 刷新 session
-  await supabase.auth.getUser();
+  // 刷新 session - 忽略错误（Edge Runtime 中的网络问题是正常的）
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    // 静默处理错误，避免日志污染
+    // 用户在客户端会重新认证
+  }
 
   return supabaseResponse;
 }
