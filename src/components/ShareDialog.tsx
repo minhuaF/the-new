@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import {
   ArticleShareTemplate,
   type ArticleShareData,
-  type WordNote,
 } from '@/components/share-templates/ArticleShareTemplate';
 import { generateAndDownload } from '@/lib/share';
 import { toast } from 'sonner';
