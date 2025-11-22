@@ -100,7 +100,7 @@ export function NoteCardTemplate({
           <div className={`${theme.cardBg} backdrop-blur-xl rounded-3xl p-8 shadow-lg border border-white/60 mb-6`}>
             <div className="text-xl text-slate-500 font-light mb-3">📖 Context</div>
             <div className="text-2xl text-slate-700 font-light leading-relaxed italic">
-              "{data.context}"
+              &ldquo;{data.context}&rdquo;
             </div>
           </div>
         )}

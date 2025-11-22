@@ -29,7 +29,6 @@ export function HighlightedText({ content, annotations }: HighlightedTextProps) 
 
   // 将文本分词并渲染
   const segments: React.ReactNode[] = [];
-  let currentIndex = 0;
 
   // 使用正则分词：保留单词、空格和标点
   const tokenRegex = /([a-zA-Z0-9'-]+)|(\s+)|([^\w\s]+)/g;
@@ -73,8 +72,6 @@ export function HighlightedText({ content, annotations }: HighlightedTextProps) 
         <span key={`text-${startIndex}`}>{token}</span>
       );
     }
-
-    currentIndex = endIndex;
   }
 
   const handlePlay = (annotation: Annotation) => {
