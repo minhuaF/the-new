@@ -106,104 +106,149 @@ export function ShareDialog({ open, onOpenChange, article, annotations = [] }: S
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] sm:max-w-4xl lg:max-w-6xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 rounded-3xl">
-        <DialogHeader>
-          <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.3em] text-rose-400 font-light">
-              Share Your Learning
-            </p>
-            <DialogTitle className="text-2xl sm:text-3xl font-serif font-light text-slate-800">
-              分享文章笔记
-            </DialogTitle>
-            <DialogDescription className="text-sm text-slate-500 font-light">
-              选择主题色，生成包含文章内容和单词笔记的分享卡片
-            </DialogDescription>
-          </div>
-        </DialogHeader>
+      <DialogContent className="max-w-[95vw] sm:max-w-5xl lg:max-w-6xl max-h-[90vh] overflow-y-auto p-0 rounded-[32px] border-0 shadow-2xl">
+        {/* 优雅的顶部区域 */}
+        <div className="relative overflow-hidden rounded-t-[32px] bg-gradient-to-br from-rose-50 via-amber-50 to-sky-50 p-8 sm:p-10">
+          <div className="absolute -top-20 -right-20 w-40 h-40 bg-rose-200 opacity-20 rounded-full blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-amber-200 opacity-20 rounded-full blur-3xl" />
 
-        <div className="space-y-6 sm:space-y-8 mt-6">
-          {/* 主题选择 */}
-          <div className="space-y-3">
-            <label className="text-sm font-light text-slate-600 tracking-wide">选择主题色</label>
-            <div className="flex flex-wrap gap-2">
+          <DialogHeader className="relative">
+            <div className="space-y-3">
+              <div className="inline-block">
+                <p className="text-xs uppercase tracking-[0.3em] text-rose-500 font-light">
+                  Share Your Learning
+                </p>
+              </div>
+              <DialogTitle className="text-3xl sm:text-4xl font-serif font-light text-slate-800 leading-tight">
+                📤 分享文章笔记
+              </DialogTitle>
+              <DialogDescription className="text-base text-slate-600 font-light leading-relaxed">
+                选择您喜欢的主题风格，生成精美的学习笔记分享卡片
+              </DialogDescription>
+            </div>
+          </DialogHeader>
+        </div>
+
+        {/* 主内容区域 */}
+        <div className="px-8 sm:px-10 pb-8 sm:pb-10 space-y-8">
+          {/* 主题选择 - 卡片式设计 */}
+          <div className="space-y-4 pt-8">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-serif font-light text-slate-700">
+                🎨 选择主题风格
+              </h3>
+              <span className="text-sm text-slate-400 font-light">
+                {annotations.length} 个单词
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {themes.map((theme) => (
-                <Button
+                <button
                   key={theme}
-                  variant={selectedTheme === theme ? 'default' : 'outline'}
-                  size="sm"
                   onClick={() => setSelectedTheme(theme)}
                   className={`
-                    text-xs sm:text-sm rounded-xl font-light tracking-wide transition-all duration-300
+                    relative group p-4 rounded-2xl border-2 transition-all duration-300 font-light
                     ${selectedTheme === theme
-                      ? 'bg-rose-400 hover:bg-rose-500 text-white shadow-md'
-                      : 'border-slate-300 hover:border-rose-400 hover:bg-rose-50'
+                      ? 'border-rose-400 bg-rose-50 shadow-md'
+                      : 'border-slate-200 bg-white hover:border-rose-300 hover:bg-rose-50/50 hover:shadow-sm'
                     }
                   `}
                 >
-                  {themeLabels[theme]}
-                </Button>
+                  <div className="text-center space-y-2">
+                    <div className={`
+                      w-12 h-12 mx-auto rounded-full transition-all duration-300
+                      ${selectedTheme === theme
+                        ? 'bg-gradient-to-br from-rose-400 to-amber-400 shadow-lg scale-110'
+                        : 'bg-gradient-to-br from-slate-200 to-slate-300 group-hover:scale-105'
+                      }
+                    `} />
+                    <p className={`
+                      text-sm transition-colors duration-300
+                      ${selectedTheme === theme
+                        ? 'text-rose-600 font-normal'
+                        : 'text-slate-600'
+                      }
+                    `}>
+                      {themeLabels[theme]}
+                    </p>
+                  </div>
+
+                  {selectedTheme === theme && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                  )}
+                </button>
               ))}
             </div>
           </div>
 
-          {/* 预览区 */}
-          <div className="flex justify-center overflow-x-auto bg-slate-50 rounded-2xl p-4">
-            <div className="transform scale-[0.25] sm:scale-[0.3] lg:scale-[0.35] origin-top">
-              {selectedTheme === 'minimalist' ? (
-                <MinimalistShareTemplate
-                  data={{
-                    title: article?.title || '示例文章标题',
-                    content: article?.content || '这是一段示例文章内容...',
-                    annotations: annotations,
-                    wordsCount: annotations.length,
-                  }}
-                />
-              ) : selectedTheme === 'illustration' ? (
-                <IllustrationShareTemplate
-                  data={{
-                    title: article?.title || '示例文章标题',
-                    content: article?.content || '这是一段示例文章内容...',
-                    annotations: annotations,
-                    wordsCount: annotations.length,
-                  }}
-                />
-              ) : selectedTheme === 'academic' ? (
-                <AcademicShareTemplate
-                  data={{
-                    title: article?.title || '示例文章标题',
-                    content: article?.content || '这是一段示例文章内容...',
-                    annotations: annotations,
-                    wordsCount: annotations.length,
-                  }}
-                />
-              ) : (
-                <ArticleShareTemplate data={{ ...shareData, theme: selectedTheme }} />
-              )}
+          {/* 预览区 - 更精致的展示 */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-serif font-light text-slate-700">
+              👁️ 预览效果
+            </h3>
+            <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200 shadow-lg overflow-hidden">
+              <div className="flex justify-center overflow-x-auto">
+                <div className="transform scale-[0.25] sm:scale-[0.3] lg:scale-[0.35] origin-top">
+                  {selectedTheme === 'minimalist' ? (
+                    <MinimalistShareTemplate
+                      data={{
+                        title: article?.title || '示例文章标题',
+                        content: article?.content || '这是一段示例文章内容...',
+                        annotations: annotations,
+                        wordsCount: annotations.length,
+                      }}
+                    />
+                  ) : selectedTheme === 'illustration' ? (
+                    <IllustrationShareTemplate
+                      data={{
+                        title: article?.title || '示例文章标题',
+                        content: article?.content || '这是一段示例文章内容...',
+                        annotations: annotations,
+                        wordsCount: annotations.length,
+                      }}
+                    />
+                  ) : selectedTheme === 'academic' ? (
+                    <AcademicShareTemplate
+                      data={{
+                        title: article?.title || '示例文章标题',
+                        content: article?.content || '这是一段示例文章内容...',
+                        annotations: annotations,
+                        wordsCount: annotations.length,
+                      }}
+                    />
+                  ) : (
+                    <ArticleShareTemplate data={{ ...shareData, theme: selectedTheme }} />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* 操作按钮 */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:justify-end pt-6 border-t border-slate-200">
+          {/* 操作按钮 - 更优雅的布局 */}
+          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 pt-6 border-t border-slate-200">
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="w-full sm:w-auto order-2 sm:order-1 h-12 border-2 border-slate-300 hover:border-amber-400 text-slate-700 rounded-2xl font-light tracking-wide transition-all duration-300 hover:bg-amber-50"
+              className="flex-1 sm:flex-initial sm:min-w-[120px] h-12 border-2 border-slate-300 hover:border-amber-400 text-slate-700 rounded-2xl font-light tracking-wide transition-all duration-300 hover:bg-amber-50 hover:shadow-md"
             >
               取消
             </Button>
             <Button
               onClick={handleGenerate}
               disabled={generating || !article || annotations.length === 0}
-              className="w-full sm:w-auto order-1 sm:order-2 h-12 bg-rose-400 hover:bg-rose-500 text-white rounded-2xl font-light tracking-wide transition-all duration-300 hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="flex-1 sm:flex-initial sm:min-w-[160px] h-12 bg-gradient-to-r from-rose-400 to-rose-500 hover:from-rose-500 hover:to-rose-600 text-white rounded-2xl font-light tracking-wide transition-all duration-300 hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:from-slate-300 disabled:to-slate-300"
             >
               {generating ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   生成中...
                 </>
               ) : (
                 <>
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="w-5 h-5 mr-2" />
                   下载图片
                 </>
               )}

@@ -10,19 +10,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
 
 interface AnnotationSidebarProps {
   annotations: Annotation[];
   onDelete: (id: string) => void;
   onRefresh?: () => void;
-  variant?: 'desktop' | 'mobile';
 }
 
 export function AnnotationSidebar({
   annotations,
   onDelete,
-  variant = 'desktop'
 }: AnnotationSidebarProps) {
   const [playingId, setPlayingId] = useState<string | null>(null);
 
@@ -67,62 +64,34 @@ export function AnnotationSidebar({
     }
   };
 
-  const isMobile = variant === 'mobile';
-
   return (
-    <div className={cn(
-      isMobile ? 'p-4' : 'p-6'
-    )}>
-      <div className={cn(
-        "flex items-center justify-between mb-6",
-        isMobile && "mb-4"
-      )}>
-        <h2 className={cn(
-          "font-serif font-light text-slate-800",
-          isMobile ? "text-lg" : "text-xl"
-        )}>
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="font-serif font-light text-slate-800 text-xl">
           📚 我的标注
         </h2>
         <span className="text-sm text-slate-400 font-light">({annotations.length})</span>
       </div>
 
       {annotations.length === 0 ? (
-        <div className={cn(
-          "text-center",
-          isMobile ? "py-12" : "py-16"
-        )}>
-          <div className={cn(
-            "mb-4",
-            isMobile ? "text-5xl" : "text-6xl"
-          )}>✨</div>
+        <div className="text-center py-16">
+          <div className="text-6xl mb-4">✨</div>
           <p className="text-slate-500 font-light mb-2">还没有标注</p>
           <p className="text-sm text-slate-400 font-light">
             选中单词开始学习吧
           </p>
         </div>
       ) : (
-        <div className={cn(
-          "space-y-4",
-          isMobile && "space-y-3"
-        )}>
+        <div className="space-y-4">
           {annotations.map((annotation) => (
             <Card
               key={annotation.id}
-              className={cn(
-                "hover:shadow-md transition-all duration-300 border-slate-200",
-                isMobile ? "rounded-2xl" : "rounded-3xl"
-              )}
+              className="hover:shadow-md transition-all duration-300 border-slate-200 rounded-3xl"
             >
-              <CardHeader className={cn(
-                "pb-3",
-                isMobile && "pb-2"
-              )}>
+              <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h3 className={cn(
-                      "font-serif font-light text-slate-800 mb-1",
-                      isMobile ? "text-base" : "text-lg"
-                    )}>
+                    <h3 className="font-serif font-light text-slate-800 mb-1 text-lg">
                       {annotation.selected_text}
                     </h3>
                     {annotation.phonetic && (
@@ -160,10 +129,7 @@ export function AnnotationSidebar({
                 </div>
               </CardHeader>
 
-              <CardContent className={cn(
-                "space-y-3 pt-0",
-                isMobile && "space-y-2"
-              )}>
+              <CardContent className="space-y-3 pt-0">
                 {/* 释义 */}
                 {annotation.definition && annotation.definition.length > 0 && (
                   <div className="text-sm space-y-1 font-light">
@@ -178,26 +144,17 @@ export function AnnotationSidebar({
 
                 {/* 上下文 */}
                 {annotation.context_sentence && (
-                  <p className={cn(
-                    "text-xs text-slate-400 font-light italic border-l-2 border-rose-200 pl-3 py-1",
-                    isMobile && "text-xs"
-                  )}>
+                  <p className="text-xs text-slate-400 font-light italic border-l-2 border-rose-200 pl-3 py-1">
                     &ldquo;{annotation.context_sentence}&rdquo;
                   </p>
                 )}
 
                 {/* 操作按钮 */}
-                <div className={cn(
-                  "flex gap-2 pt-2",
-                  isMobile && "gap-2 pt-1"
-                )}>
+                <div className="flex gap-2 pt-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    className={cn(
-                      "flex-1 border-slate-300 hover:border-rose-400 hover:bg-rose-50 rounded-xl font-light transition-all duration-300",
-                      isMobile && "text-xs h-8"
-                    )}
+                    className="flex-1 border-slate-300 hover:border-rose-400 hover:bg-rose-50 rounded-xl font-light transition-all duration-300"
                     onClick={() => handlePlay(annotation)}
                     disabled={playingId === annotation.id}
                   >
@@ -214,10 +171,7 @@ export function AnnotationSidebar({
                   <Button
                     size="sm"
                     variant="outline"
-                    className={cn(
-                      "border-slate-300 hover:border-amber-400 hover:bg-amber-50 rounded-xl font-light transition-all duration-300",
-                      isMobile && "text-xs h-8 px-3"
-                    )}
+                    className="border-slate-300 hover:border-amber-400 hover:bg-amber-50 rounded-xl font-light transition-all duration-300"
                     onClick={() => handleJumpToText(annotation.id)}
                   >
                     跳转

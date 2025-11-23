@@ -237,7 +237,6 @@ export default function ArticleDetailPage() {
             <AnnotationSidebar
               annotations={annotations}
               onDelete={handleDeleteAnnotation}
-              variant="mobile"
             />
           </div>
         </SheetContent>
