@@ -47,11 +47,30 @@ cp .env.example .env.local
 
 ### 4. 启动开发服务器
 
+#### 方式一：自动启动（推荐）
+
+使用集成启动脚本，自动检查并启动 Docker、Supabase 和 Next.js：
+
 ```bash
+npm run dev:full
+```
+
+#### 方式二：手动启动
+
+```bash
+# 1. 确保 Docker Desktop 正在运行
+# 2. 启动 Supabase 本地服务
+npm run supabase:start
+
+# 3. 启动 Next.js 开发服务器
 npm run dev
 ```
 
-访问 http://localhost:3000
+访问：
+- **应用**: http://localhost:3000
+- **Supabase Studio**: http://127.0.0.1:54323
+
+> **💡 提示**: 重启电脑后使用 `npm run dev:full` 可以自动启动所有必需的服务，避免数据库连接错误。详见 [开发环境设置指南](./docs/development-setup.md)
 
 ## 开发计划
 

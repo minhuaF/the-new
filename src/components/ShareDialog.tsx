@@ -13,6 +13,9 @@ import {
   ArticleShareTemplate,
   type ArticleShareData,
 } from '@/components/share-templates/ArticleShareTemplate';
+import { MinimalistShareTemplate } from '@/components/share-templates/MinimalistShareTemplate';
+import { IllustrationShareTemplate } from '@/components/share-templates/IllustrationShareTemplate';
+import { AcademicShareTemplate } from '@/components/share-templates/AcademicShareTemplate';
 import { generateAndDownload } from '@/lib/share';
 import { toast } from 'sonner';
 import { Download, Loader2 } from 'lucide-react';
@@ -25,9 +28,12 @@ interface ShareDialogProps {
   annotations?: Annotation[];
 }
 
-const themes = ['blue', 'orange', 'green', 'purple', 'gray'] as const;
+const themes = ['minimalist', 'illustration', 'academic', 'blue', 'orange', 'green', 'purple', 'gray'] as const;
 
 const themeLabels = {
+  minimalist: '莫兰迪简约',
+  illustration: '手绘插画',
+  academic: '学术教科书',
   blue: '清新蓝',
   orange: '温暖橙',
   green: '自然绿',
@@ -37,7 +43,7 @@ const themeLabels = {
 
 export function ShareDialog({ open, onOpenChange, article, annotations = [] }: ShareDialogProps) {
   const [generating, setGenerating] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState<typeof themes[number]>('blue');
+  const [selectedTheme, setSelectedTheme] = useState<typeof themes[number]>('minimalist');
 
   // 准备分享数据
   const shareData: ArticleShareData = {
@@ -60,8 +66,22 @@ export function ShareDialog({ open, onOpenChange, article, annotations = [] }: S
     setGenerating(true);
 
     try {
-      const elementId = 'article-share';
-      const filename = `article-${article?.title || 'share'}-${Date.now()}.png`;
+      // 根据主题选择不同的 element ID 和背景色
+      let elementId = 'article-share';
+      let backgroundColor = '#ffffff';
+
+      if (selectedTheme === 'minimalist') {
+        elementId = 'minimalist-share';
+        backgroundColor = '#F5F1E8';
+      } else if (selectedTheme === 'illustration') {
+        elementId = 'illustration-share';
+        backgroundColor = '#FFFDF7';
+      } else if (selectedTheme === 'academic') {
+        elementId = 'academic-share';
+        backgroundColor = '#FFFFFF';
+      }
+
+      const filename = `article-${article?.title || 'share'}-${selectedTheme}-${Date.now()}.png`;
 
       await generateAndDownload(
         {
@@ -69,7 +89,7 @@ export function ShareDialog({ open, onOpenChange, article, annotations = [] }: S
           format: 'png',
           quality: 1.0,
           pixelRatio: 2,
-          backgroundColor: '#ffffff',
+          backgroundColor,
         },
         filename
       );
@@ -129,7 +149,36 @@ export function ShareDialog({ open, onOpenChange, article, annotations = [] }: S
           {/* 预览区 */}
           <div className="flex justify-center overflow-x-auto bg-slate-50 rounded-2xl p-4">
             <div className="transform scale-[0.25] sm:scale-[0.3] lg:scale-[0.35] origin-top">
-              <ArticleShareTemplate data={{ ...shareData, theme: selectedTheme }} />
+              {selectedTheme === 'minimalist' ? (
+                <MinimalistShareTemplate
+                  data={{
+                    title: article?.title || '示例文章标题',
+                    content: article?.content || '这是一段示例文章内容...',
+                    annotations: annotations,
+                    wordsCount: annotations.length,
+                  }}
+                />
+              ) : selectedTheme === 'illustration' ? (
+                <IllustrationShareTemplate
+                  data={{
+                    title: article?.title || '示例文章标题',
+                    content: article?.content || '这是一段示例文章内容...',
+                    annotations: annotations,
+                    wordsCount: annotations.length,
+                  }}
+                />
+              ) : selectedTheme === 'academic' ? (
+                <AcademicShareTemplate
+                  data={{
+                    title: article?.title || '示例文章标题',
+                    content: article?.content || '这是一段示例文章内容...',
+                    annotations: annotations,
+                    wordsCount: annotations.length,
+                  }}
+                />
+              ) : (
+                <ArticleShareTemplate data={{ ...shareData, theme: selectedTheme }} />
+              )}
             </div>
           </div>
 
@@ -164,7 +213,36 @@ export function ShareDialog({ open, onOpenChange, article, annotations = [] }: S
 
         {/* 隐藏的全尺寸模板（用于生成图片） */}
         <div className="fixed -left-[10000px] -top-[10000px]">
-          <ArticleShareTemplate data={{ ...shareData, theme: selectedTheme }} />
+          {selectedTheme === 'minimalist' ? (
+            <MinimalistShareTemplate
+              data={{
+                title: article?.title || '示例文章标题',
+                content: article?.content || '这是一段示例文章内容...',
+                annotations: annotations,
+                wordsCount: annotations.length,
+              }}
+            />
+          ) : selectedTheme === 'illustration' ? (
+            <IllustrationShareTemplate
+              data={{
+                title: article?.title || '示例文章标题',
+                content: article?.content || '这是一段示例文章内容...',
+                annotations: annotations,
+                wordsCount: annotations.length,
+              }}
+            />
+          ) : selectedTheme === 'academic' ? (
+            <AcademicShareTemplate
+              data={{
+                title: article?.title || '示例文章标题',
+                content: article?.content || '这是一段示例文章内容...',
+                annotations: annotations,
+                wordsCount: annotations.length,
+              }}
+            />
+          ) : (
+            <ArticleShareTemplate data={{ ...shareData, theme: selectedTheme }} />
+          )}
         </div>
       </DialogContent>
     </Dialog>

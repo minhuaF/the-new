@@ -35,6 +35,10 @@ export function ArticleContent({
       style={{
         fontSize: `${fontSize}px`,
         lineHeight,
+        WebkitUserSelect: 'text', // iOS Safari
+        userSelect: 'text',
+        WebkitTouchCallout: 'none', // 禁用 iOS 长按菜单
+        touchAction: 'manipulation', // 优化触摸体验
       }}
     >
       <HighlightedText content={content} annotations={annotations} />

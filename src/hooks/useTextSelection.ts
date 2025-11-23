@@ -71,11 +71,15 @@ export function useTextSelection(containerSelector = '.article-content'): TextSe
     // 监听鼠标抬起事件（选择完成）
     document.addEventListener('mouseup', handleSelectionChange);
 
+    // 监听触摸结束事件（移动端）
+    document.addEventListener('touchend', handleSelectionChange);
+
     // 监听选择变化事件
     document.addEventListener('selectionchange', handleSelectionChange);
 
     return () => {
       document.removeEventListener('mouseup', handleSelectionChange);
+      document.removeEventListener('touchend', handleSelectionChange);
       document.removeEventListener('selectionchange', handleSelectionChange);
     };
   }, [handleSelectionChange]);

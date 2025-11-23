@@ -17,34 +17,75 @@ export async function queryWordDefinition(word: string): Promise<GLMWordInfo> {
         model: 'glm-4-flash', // 使用快速模型
         messages: [
           {
+            role: 'system',
+            content: `你是一位专业的英语词典专家，精通国际音标(IPA)和词汇释义。你的任务是为英语单词提供准确的音标和释义。
+
+**音标准确性至关重要**：
+- 必须使用标准的国际音标(IPA)格式
+- 音标必须完全准确，包含所有音节和重音标记
+- 对于多音节词，务必标注主重音(ˈ)和次重音(ˌ)
+- 仔细检查每个音素符号是否正确
+
+**请在返回结果前，进行以下检查：**
+1. 核对单词的音节数是否与音标匹配
+2. 确认重音位置是否正确
+3. 检查所有IPA符号是否标准且准确
+4. 对于常见词汇，参考权威词典（如牛津、剑桥、韦氏）的标注`
+          },
+          {
             role: 'user',
-            content: `请提供英文单词或短语 "${word}" 的详细信息，严格按照以下JSON格式返回，不要添加任何额外的文字说明：
+            content: `请为英文单词 "${word}" 提供详细信息，严格按照以下JSON格式返回，不要添加任何额外的文字说明：
 
 {
-  "phonetic": "IPA音标格式",
+  "phonetic": "IPA音标",
   "definitions": [
-    {"pos": "词性(如n., v., adj.等)", "meaning": "中文释义"}
+    {"pos": "词性", "meaning": "中文释义"}
   ]
 }
 
-要求：
-1. 音标使用标准IPA格式（国际音标）
-2. 如果是短语，提供整体的发音建议
-3. definitions 数组至少包含1个，最多3个常用释义
-4. pos 使用标准英文缩写（n., v., adj., adv., prep.等）
-5. 只返回JSON，不要任何其他文字
+**音标格式要求（重要！）**：
+1. 使用完整的IPA格式，包含斜杠: /ˈexample/
+2. 多音节词必须标注主重音(ˈ)和次重音(ˌ)的正确位置
+3. 美式发音为主，如有英式差异可在备注中说明
+4. 确保所有音素符号准确无误
 
-示例输出：
+**释义要求**：
+1. definitions 数组包含1-3个最常用释义
+2. pos 使用标准缩写：n. v. adj. adv. prep. conj. pron. etc.
+3. meaning 提供准确的中文释义
+
+**正确示例**：
+{
+  "phonetic": "/ˌdaɪəˈbiːtiːz/",
+  "definitions": [
+    {"pos": "n.", "meaning": "糖尿病"}
+  ]
+}
+
 {
   "phonetic": "/ˈkɒfi/",
   "definitions": [
     {"pos": "n.", "meaning": "咖啡"},
     {"pos": "n.", "meaning": "咖啡色"}
   ]
-}`,
+}
+
+{
+  "phonetic": "/ˌʌndərˈstænd/",
+  "definitions": [
+    {"pos": "v.", "meaning": "理解；明白"}
+  ]
+}
+
+**错误示例（避免）**：
+- /daɪˈbiːtiːz/ ❌ (缺少次重音，重音位置错误)
+- /kɒfi/ ❌ (缺少斜杠)
+- /'kɒfi/ ❌ (使用了错误的重音符号)
+
+请仔细检查后返回JSON，确保音标准确无误。`,
           },
         ],
-        temperature: 0.3, // 低温度确保输出稳定
+        temperature: 0.1, // 极低温度确保输出稳定和准确
       },
       {
         headers: {

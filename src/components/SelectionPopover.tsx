@@ -5,12 +5,20 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import type { TextSelection } from '@/hooks/useTextSelection';
 import { clearTextSelection } from '@/hooks/useTextSelection';
+import { X, Volume2 } from 'lucide-react';
 
 interface SelectionPopoverProps {
   selection: TextSelection;
   articleId: string;
   articleContent: string;
   onSuccess: () => void;
+}
+
+interface AnnotationData {
+  word: string;
+  phonetic?: string;
+  definition?: Array<{ pos: string; meaning: string }>;
+  audio_url?: string;
 }
 
 export function SelectionPopover({
@@ -21,6 +29,8 @@ export function SelectionPopover({
 }: SelectionPopoverProps) {
   const [loading, setLoading] = useState(false);
   const [adjustedPosition, setAdjustedPosition] = useState({ x: 0, y: 0, translateX: '-50%', translateY: '-100%' });
+  const [annotationData, setAnnotationData] = useState<AnnotationData | null>(null);
+  const [showResult, setShowResult] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
 
   // Adjust popover position to stay within viewport bounds
@@ -88,10 +98,16 @@ export function SelectionPopover({
         throw new Error(data.error || '添加失败');
       }
 
-      toast.success('标注添加成功！');
+      // 提取标注数据
+      setAnnotationData({
+        word: selection.text,
+        phonetic: data.annotation?.phonetic,
+        definition: data.annotation?.definition,
+        audio_url: data.annotation?.audio_url,
+      });
 
-      // 清除选择
-      clearTextSelection();
+      setShowResult(true);
+      toast.success('标注添加成功！');
 
       // 通知父组件刷新数据
       onSuccess();
@@ -104,6 +120,93 @@ export function SelectionPopover({
     }
   };
 
+  const handleClose = () => {
+    clearTextSelection();
+    setShowResult(false);
+    setAnnotationData(null);
+  };
+
+  const handlePlayAudio = () => {
+    if (annotationData?.audio_url) {
+      const audio = new Audio(annotationData.audio_url);
+      audio.play().catch(() => {
+        // 降级到 Web Speech API
+        playWithWebSpeech(annotationData.word);
+      });
+    } else if (annotationData?.word) {
+      playWithWebSpeech(annotationData.word);
+    }
+  };
+
+  const playWithWebSpeech = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.8;
+      speechSynthesis.speak(utterance);
+    }
+  };
+
+  // 如果显示结果，展示翻译内容
+  if (showResult && annotationData) {
+    return (
+      <div
+        ref={popoverRef}
+        className="fixed z-50 bg-white/95 backdrop-blur-lg shadow-2xl rounded-3xl border border-rose-200 p-4 animate-in fade-in zoom-in duration-300 max-w-sm"
+        style={{
+          left: `${adjustedPosition.x}px`,
+          top: `${adjustedPosition.y}px`,
+          transform: `translate(${adjustedPosition.translateX}, ${adjustedPosition.translateY})`,
+        }}
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1">
+            <h3 className="text-lg font-serif font-medium text-slate-800">
+              {annotationData.word}
+            </h3>
+            {annotationData.phonetic && (
+              <p className="text-sm text-rose-500 font-mono mt-1">
+                {annotationData.phonetic}
+              </p>
+            )}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleClose}
+            className="h-8 w-8 p-0 hover:bg-slate-100 rounded-full"
+          >
+            <X className="w-4 h-4 text-slate-400" />
+          </Button>
+        </div>
+
+        {/* Definitions */}
+        {annotationData.definition && annotationData.definition.length > 0 && (
+          <div className="space-y-2 mb-3">
+            {annotationData.definition.map((def, idx) => (
+              <div key={idx} className="text-sm">
+                <span className="text-slate-500 font-medium">{def.pos}</span>{' '}
+                <span className="text-slate-700">{def.meaning}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Play button */}
+        <Button
+          size="sm"
+          onClick={handlePlayAudio}
+          className="w-full bg-rose-400 hover:bg-rose-500 text-white rounded-xl font-light transition-all duration-300 h-9"
+        >
+          <Volume2 className="w-4 h-4 mr-2" />
+          播放发音
+        </Button>
+      </div>
+    );
+  }
+
+  // 初始状态，显示"添加发音"按钮
   return (
     <div
       ref={popoverRef}

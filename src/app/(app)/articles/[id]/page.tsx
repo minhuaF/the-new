@@ -126,6 +126,9 @@ export default function ArticleDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-amber-50 to-sky-50">
         <div className="text-center">
+          <div className="inline-block mb-4">
+            <div className="w-12 h-12 border-4 border-rose-200 border-t-rose-400 rounded-full animate-spin"></div>
+          </div>
           <div className="text-lg text-slate-500 font-light">加载中...</div>
         </div>
       </div>
