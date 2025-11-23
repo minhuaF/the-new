@@ -35,7 +35,6 @@ export function HighlightedText({ content, annotations }: HighlightedTextProps) 
   while ((match = tokenRegex.exec(content)) !== null) {
     const token = match[0];
     const startIndex = match.index;
-    const endIndex = startIndex + token.length;
 
     // 检查这个 token 是否是单词
     if (match[1]) {

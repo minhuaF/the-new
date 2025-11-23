@@ -14,7 +14,7 @@ export interface ArticleShareData {
   wordNotes: WordNote[];
   articleCount?: number; // 已读文章总数
   wordsCount?: number; // 已标注单词总数
-  theme?: 'blue' | 'orange' | 'green' | 'purple' | 'gray';
+  theme?: 'blue' | 'orange' | 'green' | 'purple' | 'gray' | 'minimalist' | 'illustration' | 'academic';
 }
 
 interface ArticleShareTemplateProps {
@@ -71,7 +71,11 @@ export function ArticleShareTemplate({
   showQR = true,
   qrUrl = 'https://yourapp.com'
 }: ArticleShareTemplateProps) {
-  const theme = themes[data.theme || 'blue'];
+  // 只使用老的主题类型，新主题使用专用模板
+  const themeKey = (data.theme && ['blue', 'orange', 'green', 'purple', 'gray'].includes(data.theme))
+    ? data.theme as 'blue' | 'orange' | 'green' | 'purple' | 'gray'
+    : 'blue';
+  const theme = themes[themeKey];
 
   // 限制显示的单词数量（最多显示8个）
   const displayWords = data.wordNotes.slice(0, 8);
